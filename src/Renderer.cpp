@@ -113,7 +113,7 @@ void Renderer::Scene(float dt) {
     float rotationAngle = oscillation * glm::radians(45.0f);
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, rotationAngle, glm::vec3(0.5f, 9.0f, rotationAngle * 2.0f));
+        model = glm::translate(model, cubePositions[i]);
     m_Shader->setMat4("model", model);
 
     vao.bind();
