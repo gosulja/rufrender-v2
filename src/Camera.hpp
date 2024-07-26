@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 enum CameraMovement {
 	FORWARD,
@@ -30,11 +31,11 @@ public:
 		glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
 		float yaw = -90.0f, float pitch = 0.0f
-	) : front(glm::vec3(0.0f, 0.0f, -1.0f)), speed(speed), sensitivity(sensitivity), zoom(zoom) {
-		position = position;
-		worldUp = up;
-		yaw = yaw;
-		pitch = pitch;
+	) : front(glm::vec3(0.0f, 0.0f, -1.0f)), speed(2.5f), sensitivity(0.1f), zoom(45.0f) {
+		this->position = position;
+		this->worldUp = up;
+		this->yaw = yaw;
+		this->pitch = pitch;
 
 		updateCameraVectors();
 	}
@@ -86,8 +87,8 @@ public:
 		xoffset *= sensitivity;
 		yoffset *= sensitivity;
 
-		yaw += xoffset;
-		yaw += yoffset;
+		yaw   += xoffset;
+		pitch += yoffset;
 
 		if (constrainPitch) {
 			if (pitch > 89.0f)
@@ -102,20 +103,21 @@ public:
 	void ProcessMouseScroll(float yoffset) {
 		zoom -= (float)yoffset;
 
+		std::cout << zoom << std::endl;
+
 		if (zoom < 1.0f)
 			zoom = 1.0f;
-		if (zoom > 45.0f)
-			zoom = 45.0f;
+		if (zoom > 120.0f)
+			zoom = 120.0f;
 	}
 
 private:
 	void updateCameraVectors() {
-		glm::vec3 front;
-
-		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front.y = sin(glm::radians(pitch));
-		front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		front = glm::normalize(front);
+		glm::vec3 newFront;
+		newFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+		newFront.y = sin(glm::radians(pitch));
+		newFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+		front = glm::normalize(newFront);
 
 		right = glm::normalize(glm::cross(front, worldUp));
 		up = glm::normalize(glm::cross(right, front));

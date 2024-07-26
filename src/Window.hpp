@@ -27,12 +27,6 @@ public:
 
 		glfwMakeContextCurrent(m_Window);
 
-		glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
-		glfwSetCursorPosCallback(m_Window, mouse_callback);
-		glfwSetScrollCallback(m_Window, scroll_callback);
-
-		glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
 		GLenum glewErr = glewInit();
 		if (glewErr != GLEW_OK) {
 			std::cerr << "Failed to initiate GLEW: " << glewGetErrorString(glewErr) << "\n";

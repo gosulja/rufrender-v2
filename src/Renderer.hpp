@@ -7,20 +7,23 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
+
+#include "Callbacks.hpp"
 #include "Shader.hpp"
-#include "VertexArray.hpp"
-#include "Buffer.hpp"
 #include "Camera.hpp"
+#include "ObjectManager.hpp"
 
 class Renderer {
 public:
     Renderer(GLFWwindow* window) 
-        : m_Window(window), camera(nullptr),
+        : m_Window(window), camera(new Camera(glm::vec3(5.0f, 0.0f, 3.0f))),
         vertexBuffer(Buffer::Type::VERTEX), 
         indexBuffer(Buffer::Type::INDEX),
         lastFrame(0.0f)
     {
         initShader();
+        initCallbacks();
+        setupScene();
     }
 
     ~Renderer() {
@@ -30,12 +33,11 @@ public:
     }
 
     void Run();
-    void Scene(float dt);
-
 private:
     GLFWwindow* m_Window;
     Shader* m_Shader;
     Camera* camera;
+    ObjectManager objectManager;
 
     float lastFrame;
 
@@ -57,7 +59,16 @@ private:
         }
     }
 
-    void setupCube();
+    void initCallbacks() {
+        g_Camera = camera;
+
+        glfwSetFramebufferSizeCallback(m_Window, framebuffer_size_callback);
+        glfwSetCursorPosCallback(m_Window, mouse_callback);
+        glfwSetScrollCallback(m_Window, scroll_callback);
+        glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    void setupScene();
 };
 
 #endif // RENDERER_HPP

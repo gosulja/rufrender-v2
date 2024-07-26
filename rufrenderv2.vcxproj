@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Callbacks.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Texture.cpp" />
@@ -28,6 +29,8 @@
     <ClInclude Include="src\Buffer.hpp" />
     <ClInclude Include="src\Callbacks.hpp" />
     <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\Object.hpp" />
+    <ClInclude Include="src\ObjectManager.hpp" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\Shader.hpp" />
     <ClInclude Include="include\stb_image.h" />
