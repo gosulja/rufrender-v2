@@ -34,6 +34,12 @@
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\GLFW\glfw3.h" />
+    <ClInclude Include="include\GLFW\glfw3native.h" />
+    <ClInclude Include="include\GL\eglew.h" />
+    <ClInclude Include="include\GL\glew.h" />
+    <ClInclude Include="include\GL\glxew.h" />
+    <ClInclude Include="include\GL\wglew.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\imgui_impl_glfw.h" />
@@ -43,6 +49,7 @@
     <ClInclude Include="include\imgui\imstb_rectpack.h" />
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
+    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="src\Buffer.hpp" />
     <ClInclude Include="src\Callbacks.hpp" />
     <ClInclude Include="src\Camera.hpp" />
@@ -52,12 +59,15 @@
     <ClInclude Include="src\ObjectManager.hpp" />
     <ClInclude Include="src\Renderer.hpp" />
     <ClInclude Include="src\Shader.hpp" />
-    <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="src\Texture.hpp" />
     <ClInclude Include="src\VertexArray.hpp" />
     <ClInclude Include="src\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitattributes" />
+    <None Include=".gitignore" />
+    <None Include="imgui.ini" />
+    <None Include="README.md" />
     <None Include="src\shaders\default.frag" />
     <None Include="src\shaders\default.vert" />
     <None Include="src\shaders\lighting.frag" />
