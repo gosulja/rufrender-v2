@@ -66,6 +66,8 @@
     <None Include="src\shaders\light_cube.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="src\textures\container2.png" />
+    <Image Include="src\textures\container2_specular.png" />
     <Image Include="src\textures\wall.jpg" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

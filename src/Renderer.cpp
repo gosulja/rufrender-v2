@@ -14,8 +14,6 @@ void Renderer::Run() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	Texture texture("src/textures/wall.jpg", true);
-
 	while (!glfwWindowShouldClose(m_Window)) {
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
@@ -28,8 +26,6 @@ void Renderer::Run() {
 
         m_Gui->BeginFrame();
 
-		texture.bind();
-
 		glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)800.0f / (float)600.0f, 0.1f, 100.0f);
         glm::mat4 view = camera->GetViewMatrix();
 
@@ -37,10 +33,23 @@ void Renderer::Run() {
         m_LightingShader->setMat4("projection", projection);
         m_LightingShader->setMat4("view", view);
 
+        glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
         m_LightingShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        m_LightingShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        m_LightingShader->setVec3("lightPos", lightPos);
+        m_LightingShader->setVec3("lightColor", lightColor);
+        m_LightingShader->setVec3("light.position", lightPos);
         m_LightingShader->setVec3("viewPos", camera->position);
+
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+        m_LightingShader->setVec3("light.ambient", ambientColor);
+        m_LightingShader->setVec3("light.diffuse", diffuseColor);
+        m_LightingShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+        m_LightingShader->setInt("material.diffuse", 0);
+        m_LightingShader->setInt("material.specular", 1);
+        m_LightingShader->setFloat("material.shininess", 64.0f);
 
         objectManager.DrawObjects(m_LightingShader, currentFrame);
 
@@ -117,12 +126,12 @@ void Renderer::setupScene() {
     };
 
     for (const auto& position : positions) {
-        auto cube = std::make_unique<Object>(vertices, indices, "src/textures/wall.jpg");
+        auto cube = std::make_unique<Object>(vertices, indices, "src/textures/container2.png", "src/textures/container2_specular.png");
         cube->SetPosition(position);
         objectManager.AddObject(std::move(cube));
     }
 
-    m_lightCube = std::make_unique<Object>(vertices, indices, "src/textures/wall.jpg");
+    m_lightCube = std::make_unique<Object>(vertices, indices, "src/textures/container2.png", "src/textures/container2_specular.png");
     m_lightCube->SetPosition(lightPos);
     m_lightCube->SetScale(glm::vec3(0.2f));
 
@@ -138,7 +147,6 @@ void Renderer::setupScene() {
 
     vao.addVertexBuffer(vertexBuffer, attributes);
 
-    // Setup light VAO
     light_vao.bind();
     lightbuffer.setData(vertices);
     light_vao.addVertexBuffer(lightbuffer, attributes);
