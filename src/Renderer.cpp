@@ -10,6 +10,8 @@
 #include "Texture.hpp"
 
 void Renderer::Run() {
+    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 	glEnable(GL_DEPTH_TEST);
 
 	Texture texture("src/textures/wall.jpg", true);
@@ -24,69 +26,86 @@ void Renderer::Run() {
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		texture.bind();
+        m_Gui->BeginFrame();
 
-		m_Shader->use();
+		texture.bind();
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)800.0f / (float)600.0f, 0.1f, 100.0f);
         glm::mat4 view = camera->GetViewMatrix();
 
-		m_Shader->setMat4("projection", projection);
-		m_Shader->setMat4("view", view);
+        m_LightingShader->use();
+        m_LightingShader->setMat4("projection", projection);
+        m_LightingShader->setMat4("view", view);
 
-		m_Shader->setInt("aTexture", 0);
+        m_LightingShader->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+        m_LightingShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        m_LightingShader->setVec3("lightPos", lightPos);
+        m_LightingShader->setVec3("viewPos", camera->position);
 
-        objectManager.DrawObjects(m_Shader);
+        objectManager.DrawObjects(m_LightingShader, currentFrame);
+
+        m_LightCubeShader->use();
+        m_LightCubeShader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        m_LightCubeShader->setMat4("model", m_lightCube->GetModelMatrix());
+        m_LightCubeShader->setMat4("view", camera->GetViewMatrix());
+        m_LightCubeShader->setMat4("projection", projection);
+
+        m_lightCube->Draw(m_LightCubeShader, currentFrame);
+
+        m_Gui->Draw(*camera);
+        m_Gui->EndFrame();
 
 		glfwSwapBuffers(m_Window);
 		glfwPollEvents();
 	}
 
 	vao.unbind();
+
+    m_Gui->~Gui();
 }
 
 void Renderer::setupScene() {
     std::vector<float> vertices = {
-        // positions          // tex coords
+        // positions         // normal           // tex coords
         // front face
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 0.0f, 1.0f,
         // back face
-        -0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, 0.0f,  0.0f, -1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f, 0.0f,  0.0f, -1.0f, 0.0f, 0.0f,
+         0.5f,  0.5f, -0.5f, 0.0f,  0.0f, -1.0f, 0.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f, 0.0f,  0.0f, -1.0f, 1.0f, 1.0f,
         // left face
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
         // right face
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f, 1.0f,  0.0f,  0.0f, 0.0f, 0.0f,
          // top face
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+         -0.5f,  0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.0f, 1.0f,
+          0.5f,  0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 1.0f, 1.0f,
+          0.5f,  0.5f,  0.5f, 0.0f,  1.0f,  0.0f, 1.0f, 0.0f,
+         -0.5f,  0.5f,  0.5f, 0.0f,  1.0f,  0.0f, 0.0f, 0.0f,
          // bottom face
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f
+         -0.5f, -0.5f, -0.5f, 0.0f, -1.0f,  0.0f, 0.0f, 1.0f,
+          0.5f, -0.5f, -0.5f, 0.0f, -1.0f,  0.0f, 1.0f, 1.0f,
+          0.5f, -0.5f,  0.5f, 0.0f, -1.0f,  0.0f, 1.0f, 0.0f,
+         -0.5f, -0.5f,  0.5f, 0.0f, -1.0f,  0.0f, 0.0f, 0.0f
     };
 
     std::vector<unsigned int> indices = {
         0,  1,  2,  2,  3,  0,  // front face
         4,  5,  6,  6,  7,  4,  // back face
         8,  9, 10, 10, 11,  8,  // left face
-        12, 13, 14, 14, 15, 12,  // right face
-        16, 17, 18, 18, 19, 16,  // top face
-        20, 21, 22, 22, 23, 20   // bottom face
+        12, 13, 14, 14, 15, 12, // right face
+        16, 17, 18, 18, 19, 16, // top face
+        20, 21, 22, 22, 23, 20  // bottom face
     };
 
     std::vector<glm::vec3> positions = {
@@ -102,43 +121,25 @@ void Renderer::setupScene() {
         cube->SetPosition(position);
         objectManager.AddObject(std::move(cube));
     }
-}
 
-/*
-void Renderer::Scene(float dt) {
-    std::vector<glm::vec3> cubePositions = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f)
-    };
+    m_lightCube = std::make_unique<Object>(vertices, indices, "src/textures/wall.jpg");
+    m_lightCube->SetPosition(lightPos);
+    m_lightCube->SetScale(glm::vec3(0.2f));
 
     vao.bind();
-    indexBuffer.bind();
+    vertexBuffer.setData(vertices);
+    indexBuffer.setData(indices);
 
-    for (unsigned int i = 0; i < cubePositions.size(); i++) {
-        float oscillation = cos(dt * 3.0f + i * 0.5f);
-        float rotationAngle = oscillation * glm::radians(45.0f);
+    std::vector<VertexAttribute> attributes = {
+        {0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0},
+        {1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))},
+        {2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))}
+    };
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePositions[i]);
+    vao.addVertexBuffer(vertexBuffer, attributes);
 
-        glm::vec3 rotationAxis = glm::normalize(glm::vec3(1.0f + i * 0.2f, 0.3f + i * 0.1f, 0.5f + i * 0.15f));
-        model = glm::rotate(model, rotationAngle, rotationAxis);
-
-        float additionalRotation = sin(dt * (20.0f + i * 5.0f));
-        model = glm::rotate(model, glm::radians(additionalRotation), glm::vec3(0.0f, 1.0f, 0.0f));
-
-        m_Shader->setMat4("model", model);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    }
-
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        std::cerr << "OpenGL error: " << err << std::endl;
-    }
-
-    vao.unbind();
+    // Setup light VAO
+    light_vao.bind();
+    lightbuffer.setData(vertices);
+    light_vao.addVertexBuffer(lightbuffer, attributes);
 }
-*/

@@ -5,8 +5,8 @@
 #include "Window.hpp"
 #include "Renderer.hpp"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 1100
+#define HEIGHT 700
 
 int main() {
 	Window* window = new Window(WIDTH, HEIGHT);

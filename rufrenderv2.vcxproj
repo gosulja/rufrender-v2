@@ -19,16 +19,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Callbacks.cpp" />
+    <ClCompile Include="src\GuiThemes.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\imgui\imconfig.h" />
+    <ClInclude Include="include\imgui\imgui.h" />
+    <ClInclude Include="include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="include\imgui\imgui_internal.h" />
+    <ClInclude Include="include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="include\imgui\imstb_textedit.h" />
+    <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Buffer.hpp" />
     <ClInclude Include="src\Callbacks.hpp" />
     <ClInclude Include="src\Camera.hpp" />
+    <ClInclude Include="src\Gui.hpp" />
+    <ClInclude Include="src\GuiThemes.hpp" />
     <ClInclude Include="src\Object.hpp" />
     <ClInclude Include="src\ObjectManager.hpp" />
     <ClInclude Include="src\Renderer.hpp" />
@@ -41,6 +60,10 @@
   <ItemGroup>
     <None Include="src\shaders\default.frag" />
     <None Include="src\shaders\default.vert" />
+    <None Include="src\shaders\lighting.frag" />
+    <None Include="src\shaders\lighting.vert" />
+    <None Include="src\shaders\light_cube.frag" />
+    <None Include="src\shaders\light_cube.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\textures\wall.jpg" />

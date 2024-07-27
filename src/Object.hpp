@@ -22,6 +22,10 @@ public:
 	void SetRotation(const glm::vec3& rotation) { m_rotation = rotation; }
 	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 
+	glm::vec3 GetPosition() { return m_position; }
+	glm::vec3 GetRotation() { return m_rotation; }
+	glm::vec3 GetScale() { return m_scale; }
+
 	glm::mat4 GetModelMatrix() const {
 		glm::mat4 model = glm::mat4(1.0f);
 		model = glm::translate(model, m_position);
@@ -32,21 +36,35 @@ public:
 		return model;
 	}
 
-	void Draw(Shader* shader) {
+	void SetShader(Shader* shader) { m_shader = shader; }
+	Shader* GetShader() const { return m_shader; }
+
+	void Draw(Shader* shader, float dt) {
 		shader->use();
 		m_texture->bind();
 		shader->setMat4("model", GetModelMatrix());
 		m_vao.bind();
-		glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
+
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
 		m_vao.unbind();
 	}
 
+	std::string GetInfo() const {
+		std::string info = "Object Info:\n";
+		info += "Position: (" + std::to_string(m_position.x) + ", " + std::to_string(m_position.y) + ", " + std::to_string(m_position.z) + ")\n";
+		info += "Rotation: (" + std::to_string(m_rotation.x) + ", " + std::to_string(m_rotation.y) + ", " + std::to_string(m_rotation.z) + ")\n";
+		info += "Scale: (" + std::to_string(m_scale.x) + ", " + std::to_string(m_scale.y) + ", " + std::to_string(m_scale.z) + ")\n";
+		return info;
+	}
 private:
 	VertexArray m_vao;
 	Buffer m_vbo;
 	Buffer m_ebo;
 	std::unique_ptr<Texture> m_texture;
 	unsigned int m_indexCount;
+
+	Shader* m_shader;
 
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
@@ -62,8 +80,9 @@ private:
 		m_indexCount = indices.size();
 
 		std::vector<VertexAttribute> attributes = {
-			{0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0},
-			{1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))}
+			{0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0},
+			{1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))},
+			{2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))}
 		};
 
 		m_vao.addVertexBuffer(m_vbo, attributes);
